@@ -10,8 +10,11 @@ client = genai.Client(api_key=api_key)
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User Prompt")
+parser.add_argument("--verbose", action="store_true",
+                    help="Enable verbose output")
 args = parser.parse_args()
 user_input = args.user_prompt
+
 
 messages = [types.Content(
     role="user", parts=[types.Part(text=args.user_prompt)])]
@@ -22,7 +25,6 @@ response = client.models.generate_content(
 
 
 def main():
-    print("Hello from boot-dev-ai-agent!")
 
     if api_key == None:
         raise RuntimeError("Environment variable not found!")
@@ -30,11 +32,15 @@ def main():
     if response.usage_metadata == None:
         raise RuntimeError("Failed API request")
 
-    X = response.usage_metadata.prompt_token_count
-    Y = response.usage_metadata.candidates_token_count
+    prompt_tokens = response.usage_metadata.prompt_token_count
+    response_tokens = response.usage_metadata.candidates_token_count
+    user_prompt = user_input
 
-    print(f"Prompt tokens: {X}")
-    print(f"Response tokens: {Y}")
+    if args.verbose:
+        print(f"User prompt: {user_prompt}")
+        print(f"Prompt tokens: {prompt_tokens}")
+        print(f"Response tokens: {response_tokens}")
+
     print(response.text)
 
 
