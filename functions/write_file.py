@@ -2,7 +2,7 @@ import os
 from google.genai import types
 
 schema_write_file = types.FunctionDeclaration(
-    name="run_python_file",
+    name="write_file",
     description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
     parameters=types.Schema(
         type=types.Type.OBJECT,

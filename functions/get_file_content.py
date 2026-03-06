@@ -4,15 +4,16 @@ from google.genai import types
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
+    description="Reads the content of a specified file from the filesystem.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+                description="The relative path to the file to be read",
             ),
         },
+        required=["file_path"]
     ),
 )
 
