@@ -4,15 +4,23 @@ from google.genai import types
 
 schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
-    description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
+    description="Executes a Python script and returns its output.",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
-            "directory": types.Schema(
+            "file_path": types.Schema(
                 type=types.Type.STRING,
-                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+                description="The path to the .py file you want to run.",
             ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(
+                    type=types.Type.STRING,
+                ),
+                description="Optional arguments to pass to the script"
+            )
         },
+        required=["file_path"]
     ),
 )
 
