@@ -18,7 +18,7 @@ schema_run_python_file = types.FunctionDeclaration(
                     type=types.Type.STRING,
                 ),
                 description="Optional arguments to pass to the script"
-            )
+            ),
         },
         required=["file_path"]
     ),
