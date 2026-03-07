@@ -29,13 +29,33 @@ def main():
             model='gemini-2.5-flash', contents=messages, config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt)
         )
 
-        if response.candidates != None:
+        if response.candidates is not None:
             for candidate in response.candidates:
                 messages.append(candidate.content)
+
+        if response.function_calls:
+            function_results = []
+            for call in response.function_calls:
+                function_call_result = call_function(
+                    call, verbose=args.verbose)
+
+                if not function_call_result.parts:
+                    raise Exception("Parts list is empty!")
+
+                if function_call_result.parts[0].function_response is None or function_call_result.parts[0].function_response.response is None:
+                    raise Exception(
+                        "The function_response or response in the list are None!")
+                else:
+                    function_results.append(function_call_result.parts[0])
+
+                if args.verbose:
+                    print(
+                        f"-> {function_call_result.parts[0].function_response.response}")
+
+            messages.append(types.Content(role="user", parts=function_results))
         else:
             print(response.text)
-
-        break
+            return
 
         if api_key == None:
             raise RuntimeError("Environment variable not found!")
@@ -51,28 +71,6 @@ def main():
             print(f"User prompt: {user_prompt}")
             print(f"Prompt tokens: {prompt_tokens}")
             print(f"Response tokens: {response_tokens}")
-
-        function_results = []
-        if response.function_calls:
-            for call in response.function_calls:
-                function_call_result = call_function(
-                    call, verbose=args.verbose)
-
-                if not function_call_result.parts:
-                    raise Exception("Parts list is empty!")
-
-                if function_call_result.parts[0].function_response == None or function_call_result.parts[0].function_response.response == None:
-                    raise Exception(
-                        "The function_response or response in the list are None!")
-                else:
-                    function_results.append(function_call_result.parts[0])
-
-                if args.verbose:
-                    print(
-                        f"-> {function_call_result.parts[0].function_response.response}")
-
-    else:
-        print(response.text)
 
 
 if __name__ == "__main__":
