@@ -5,6 +5,7 @@ import argparse
 from google.genai import types
 from prompt import system_prompt
 from functions.call_function import available_functions
+from functions.call_function import call_function
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -14,9 +15,9 @@ parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User Prompt")
 parser.add_argument("--verbose", action="store_true",
                     help="Enable verbose output")
+
 args = parser.parse_args()
 user_input = args.user_prompt
-
 
 messages = [types.Content(
     role="user", parts=[types.Part(text=args.user_prompt)])]
@@ -43,9 +44,24 @@ def main():
         print(f"Prompt tokens: {prompt_tokens}")
         print(f"Response tokens: {response_tokens}")
 
+    function_results = []
     if response.function_calls:
         for call in response.function_calls:
-            print(f"Calling function: {call.name}({call.args})")
+            function_call_result = call_function(call, verbose=args.verbose)
+
+            if not function_call_result.parts:
+                raise Exception("Parts list is empty!")
+
+            if function_call_result.parts[0].function_response == None or function_call_result.parts[0].function_response.response == None:
+                raise Exception(
+                    "The function_response or response in the list are None!")
+            else:
+                function_results.append(function_call_result.parts[0])
+
+            if args.verbose:
+                print(
+                    f"-> {function_call_result.parts[0].function_response.response}")
+
     else:
         print(response.text)
 
