@@ -72,6 +72,10 @@ def main():
             print(f"Prompt tokens: {prompt_tokens}")
             print(f"Response tokens: {response_tokens}")
 
+    else:
+        print("Max iterations reached. No result!")
+        exit(1)
+
 
 if __name__ == "__main__":
     main()
